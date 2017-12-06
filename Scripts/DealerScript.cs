@@ -175,6 +175,7 @@ public class DealerScript : MonoBehaviour {
         buf = Dealbuf;
         HITbutton.SetActive(false);
         STAYbutton.SetActive(false);
+        onemorecheck = 9;
     }
     int whotogive = 0; //defines who will get the next card 0-nobody 1-player 2-computer
 
@@ -222,14 +223,14 @@ public class DealerScript : MonoBehaviour {
         Finaltxt.text = "";        
         if (firstgame == 0)
         {
-            CardOrd--;
+            
             DealPos--;
             CurPos--;
-            for (int i = CardOrd; i >= CardOrd - (DealPos + CurPos + 1); i--)
+            for (int i = CardOrd-1; i >= CardOrd - (DealPos + CurPos + 1); i--)
             {
                 Deck[CardOrder[i]].SetActive(false);
             }
-            CardOrd++;
+            
         }
         DealPos = CurPos = 0;
         for (int i = 0; i < 2; i++)
@@ -254,8 +255,9 @@ public class DealerScript : MonoBehaviour {
         HITbutton.SetActive(true);
         STAYbutton.SetActive(true);
         whotogive = 1;
+        onemorecheck = 9;
     }
-
+    int onemorecheck;
     void LateUpdate () {
 
         PlayerScoretxt.text = "Your Score: " + PlayerScore.ToString();
@@ -265,10 +267,16 @@ public class DealerScript : MonoBehaviour {
         {
             HITbutton.SetActive(true);
             STAYbutton.SetActive(true);
-            PlayerScore = buf;            
-            if (PlayerScore > 21)
+            PlayerScore = buf;
+
+            if (PlayerScore > 21 && onemorecheck == 0)
             {
-                Final ();
+                Final();
+            }
+
+            if (PlayerScore > 21 && onemorecheck > 0)
+            {
+                onemorecheck--;
             }
         }
         
@@ -282,10 +290,13 @@ public class DealerScript : MonoBehaviour {
                 DealPos++; CardOrd++;
             }
 
-            if (DealerScore >= 17)
-            {
-                Final ();
-            }
+            if (DealerScore > 21 && onemorecheck == 0)
+                Final();
+            if (DealerScore > 21 && onemorecheck > 0)
+                onemorecheck--;
+            if (DealerScore >= 17 && DealerScore < 22)
+                Final();
+         
         }
     }
 }
