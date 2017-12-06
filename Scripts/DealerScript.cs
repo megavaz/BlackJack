@@ -172,7 +172,7 @@ public class DealerScript : MonoBehaviour {
     public void STAYenabled ()
     {
         whotogive = 2;
-        buf = 0;
+        buf = Dealbuf;
         HITbutton.SetActive(false);
         STAYbutton.SetActive(false);
     }
@@ -184,12 +184,12 @@ public class DealerScript : MonoBehaviour {
         HITbutton.SetActive(false);
         STAYbutton.SetActive(false);
         NEWHANDbutton.SetActive(true);
-        if (PlayerScore > 22)
+        if (PlayerScore > 21)
         {
             Finaltxt.text = "You lost";
         }
 
-        if (DealerScore > 22)
+        if (DealerScore > 21)
         {
             Finaltxt.text = "You win";
         }
@@ -229,6 +229,7 @@ public class DealerScript : MonoBehaviour {
             {
                 Deck[CardOrder[i]].SetActive(false);
             }
+            CardOrd++;
         }
         DealPos = CurPos = 0;
         for (int i = 0; i < 2; i++)
@@ -249,13 +250,13 @@ public class DealerScript : MonoBehaviour {
             PlayerScore = buf;
         }
         Plbuf = PlayerScore;
-        buf = 0;
+        buf = Plbuf;
         HITbutton.SetActive(true);
         STAYbutton.SetActive(true);
         whotogive = 1;
     }
 
-    void Update () {
+    void LateUpdate () {
 
         PlayerScoretxt.text = "Your Score: " + PlayerScore.ToString();
         DealerScoretxt.text = "Dealer Score: " + DealerScore.ToString();
@@ -264,8 +265,8 @@ public class DealerScript : MonoBehaviour {
         {
             HITbutton.SetActive(true);
             STAYbutton.SetActive(true);
-            PlayerScore = Plbuf + buf;            
-            if (PlayerScore > 22)
+            PlayerScore = buf;            
+            if (PlayerScore > 21)
             {
                 Final ();
             }
@@ -273,7 +274,7 @@ public class DealerScript : MonoBehaviour {
         
         if (whotogive == 2)
         {
-            DealerScore = Dealbuf + buf;
+            DealerScore = buf;
             if (DealerScore < 17)
             {
                 Deck[CardOrder[CardOrd]].SetActive(true);
