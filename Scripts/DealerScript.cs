@@ -19,13 +19,15 @@ public class DealerScript : MonoBehaviour {
     public GameObject Four1, Four2, Four3, Four4, Four5, Four6, Four7, Four8, Four9, Four10, Four11, Four12, Four13, Four14, Four15, Four16, Four17, Four18, Four19, Four20;
     public GameObject Three1, Three2, Three3, Three4, Three5, Three6, Three7, Three8, Three9, Three10, Three11, Three12, Three13, Three14, Three15, Three16, Three17, Three18, Three19, Three20;
     public GameObject Two1, Two2, Two3, Two4, Two5, Two6, Two7, Two8, Two9, Two10, Two11, Two12, Two13, Two14, Two15, Two16, Two17, Two18, Two19, Two20;
-    public Text countText1;
-    public static int buf, count1;    
+    public Text DealerScoretxt, PlayerScoretxt, Finaltxt;
+    public static int buf, DealerScore, PlayerScore;    
     public static int NumberOfDecks = 5;
     private GameObject[] Deck = new GameObject[261];
     Vector2 PlayerPosition1 = new Vector2(-65, -35), PlayerPosition2 = new Vector2(-48, -35), PlayerPosition3 = new Vector2(-31, -35), PlayerPosition4 = new Vector2(-14, -35), PlayerPosition5 = new Vector2(3, -35), PlayerPosition6 = new Vector2(20, -35), PlayerPosition7 = new Vector2(37, -35), PlayerPosition8 = new Vector2(54, -35), PlayerPosition9 = new Vector2(71, -35);
     private Vector2[] CurrentPosition = new Vector2[9];
+    private Vector2[] DealerPosition = new Vector2[9];
     int[] CardOrder = new int[261];
+    public GameObject HITbutton, STAYbutton, NEWHANDbutton;
 
 
 
@@ -46,7 +48,7 @@ public class DealerScript : MonoBehaviour {
     }
     unsafe void Start () {
 
-        buf=DealerScript.count1=PlayerScript.count = 0;
+        buf = PlayerScore = DealerScore = 0;
 
         for (int i = 0; i < 261; i++)
         {
@@ -128,8 +130,17 @@ public class DealerScript : MonoBehaviour {
         CurrentPosition[5] = PlayerPosition6;
         CurrentPosition[6] = PlayerPosition7;
         CurrentPosition[7] = PlayerPosition8;
-        CurrentPosition[8] = PlayerPosition9;        
+        CurrentPosition[8] = PlayerPosition9;
 
+        DealerPosition[0] = new Vector2(-38, 25);
+        DealerPosition[1] = new Vector2(-20, 25);
+        DealerPosition[2] = new Vector2(-3, 25);
+        DealerPosition[3] = new Vector2(14, 25);
+        DealerPosition[4] = new Vector2(31, 25);
+        DealerPosition[5] = new Vector2(48, 25);
+        DealerPosition[6] = new Vector2(65, 25);
+        DealerPosition[7] = new Vector2(82, 25);
+        DealerPosition[8] = new Vector2(99, 25);
 
         for (int i = 0; i <= 260; i++)
         {
@@ -143,14 +154,13 @@ public class DealerScript : MonoBehaviour {
         
         fixed (int* m = CardOrder)
         Shuffle(m, NumberOfDecks);
-        Debug.Log(CardOrder[7]);
-        
-        
-
+        firstgame = 1;
+        NewHand();
+        firstgame = 0;
     }
 
-    int CurPos = 0, CardOrd = 1;
-
+    int CurPos = 0, CardOrd = 1, DealPos = 0;
+    
     public void HITenabled ()
     {
         Debug.Log("clicked");
@@ -159,10 +169,122 @@ public class DealerScript : MonoBehaviour {
         CurPos++; CardOrd++;        
     }
 
+    public void STAYenabled ()
+    {
+        whotogive = 2;
+        buf = 0;
+        HITbutton.SetActive(false);
+        STAYbutton.SetActive(false);
+    }
+    int whotogive = 0; //defines who will get the next card 0-nobody 1-player 2-computer
+
+    public void Final ()
+    {
+        whotogive = 0;
+        HITbutton.SetActive(false);
+        STAYbutton.SetActive(false);
+        NEWHANDbutton.SetActive(true);
+        if (PlayerScore > 22)
+        {
+            Finaltxt.text = "You lost";
+        }
+
+        if (DealerScore > 22)
+        {
+            Finaltxt.text = "You win";
+        }
+         if (DealerScore < 22 && PlayerScore < 22)
+        {
+            if (DealerScore>PlayerScore)
+            {
+                Finaltxt.text = "You lost";
+            }
+
+            if (DealerScore < PlayerScore)
+            {
+                Finaltxt.text = "You win";
+            }
+
+            if (DealerScore == PlayerScore)
+            {
+                Finaltxt.text = "Draw";
+            }
+        }
+    }
+    int Plbuf, Dealbuf;
+    int firstgame;
+
+
+    public void NewHand ()
+    {
+        NEWHANDbutton.SetActive(false);
+        buf = PlayerScore = DealerScore = 0;
+        Finaltxt.text = "";        
+        if (firstgame == 0)
+        {
+            CardOrd--;
+            DealPos--;
+            CurPos--;
+            for (int i = CardOrd; i >= CardOrd - (DealPos + CurPos + 1); i--)
+            {
+                Deck[CardOrder[i]].SetActive(false);
+            }
+        }
+        DealPos = CurPos = 0;
+        for (int i = 0; i < 2; i++)
+        {
+            Deck[CardOrder[CardOrd]].SetActive(true);
+            Deck[CardOrder[CardOrd]].transform.localPosition = DealerPosition[DealPos];
+            DealPos++; CardOrd++;
+            DealerScore = buf;
+        }
+
+        Dealbuf = DealerScore;
+        buf = 0;
+        for (int i = 0; i < 2; i++)
+        {
+            Deck[CardOrder[CardOrd]].SetActive(true);
+            Deck[CardOrder[CardOrd]].transform.localPosition = CurrentPosition[CurPos];
+            CurPos++; CardOrd++;
+            PlayerScore = buf;
+        }
+        Plbuf = PlayerScore;
+        buf = 0;
+        HITbutton.SetActive(true);
+        STAYbutton.SetActive(true);
+        whotogive = 1;
+    }
+
     void Update () {
-        count1 = buf;
-        countText1.text = "Dealer Count: " + count1.ToString();
+
+        PlayerScoretxt.text = "Your Score: " + PlayerScore.ToString();
+        DealerScoretxt.text = "Dealer Score: " + DealerScore.ToString();
+
+        if (whotogive == 1)
+        {
+            HITbutton.SetActive(true);
+            STAYbutton.SetActive(true);
+            PlayerScore = Plbuf + buf;            
+            if (PlayerScore > 22)
+            {
+                Final ();
+            }
+        }
         
-        
+        if (whotogive == 2)
+        {
+            DealerScore = Dealbuf + buf;
+            if (DealerScore < 17)
+            {
+                Deck[CardOrder[CardOrd]].SetActive(true);
+                Deck[CardOrder[CardOrd]].transform.localPosition = DealerPosition[DealPos];
+                DealPos++; CardOrd++;
+            }
+
+            if (DealerScore >= 17)
+            {
+                Final ();
+            }
+        }
     }
 }

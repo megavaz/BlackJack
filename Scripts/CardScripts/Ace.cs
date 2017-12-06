@@ -22,7 +22,7 @@ using UnityEngine;
     
 
     
-    void LateUpdate () {
+    void Update () {
 
         if ((DealerScript.buf > 21) && (status == 1))
         {
