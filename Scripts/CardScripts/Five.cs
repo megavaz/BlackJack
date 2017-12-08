@@ -10,7 +10,10 @@ public class Five : MonoBehaviour {
 	}
     private void OnEnable()
     {
-        DealerScript.buf += 5;
+        if (DealerScript.whotogive == 1)
+            DealerScript.PlayerScore += 5;
+        if (DealerScript.whotogive == 2)
+            DealerScript.DealerScore += 5;
     }
     // Update is called once per frame
     void Update () {

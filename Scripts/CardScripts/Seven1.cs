@@ -10,7 +10,10 @@ public class Seven1 : MonoBehaviour {
 	}
     private void OnEnable()
     {
-        DealerScript.buf += 7;
+        if (DealerScript.whotogive == 1)
+            DealerScript.PlayerScore += 7;
+        if (DealerScript.whotogive == 2)
+            DealerScript.DealerScore += 7;
     }
     // Update is called once per frame
     void Update () {

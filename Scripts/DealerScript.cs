@@ -20,7 +20,7 @@ public class DealerScript : MonoBehaviour {
     public GameObject Three1, Three2, Three3, Three4, Three5, Three6, Three7, Three8, Three9, Three10, Three11, Three12, Three13, Three14, Three15, Three16, Three17, Three18, Three19, Three20;
     public GameObject Two1, Two2, Two3, Two4, Two5, Two6, Two7, Two8, Two9, Two10, Two11, Two12, Two13, Two14, Two15, Two16, Two17, Two18, Two19, Two20;
     public Text DealerScoretxt, PlayerScoretxt, Finaltxt;
-    public static int buf, DealerScore, PlayerScore;    
+    public static int /*buf,*/ DealerScore, PlayerScore;    
     public static int NumberOfDecks = 5;
     private GameObject[] Deck = new GameObject[261];
     Vector2 PlayerPosition1 = new Vector2(-65, -35), PlayerPosition2 = new Vector2(-48, -35), PlayerPosition3 = new Vector2(-31, -35), PlayerPosition4 = new Vector2(-14, -35), PlayerPosition5 = new Vector2(3, -35), PlayerPosition6 = new Vector2(20, -35), PlayerPosition7 = new Vector2(37, -35), PlayerPosition8 = new Vector2(54, -35), PlayerPosition9 = new Vector2(71, -35);
@@ -48,7 +48,7 @@ public class DealerScript : MonoBehaviour {
     }
     unsafe void Start () {
 
-        buf = PlayerScore = DealerScore = 0;
+        PlayerScore = DealerScore = 0;
 
         for (int i = 0; i < 261; i++)
         {
@@ -150,9 +150,10 @@ public class DealerScript : MonoBehaviour {
         for (int i = 1; i < 261; i++)
         {
             Deck[i].SetActive(false);
-        } 
-        
+        }
+
         fixed (int* m = CardOrder)
+        for (int i = 0; i<3; i++)
         Shuffle(m, NumberOfDecks);
         firstgame = 1;
         NewHand();
@@ -171,13 +172,12 @@ public class DealerScript : MonoBehaviour {
 
     public void STAYenabled ()
     {
-        whotogive = 2;
-        buf = Dealbuf;
+        whotogive = 2;        
         HITbutton.SetActive(false);
         STAYbutton.SetActive(false);
         onemorecheck = 9;
     }
-    int whotogive = 0; //defines who will get the next card 0-nobody 1-player 2-computer
+    public static int whotogive = 0; //defines who will get the next card 0-nobody 1-player 2-computer
 
     public void Final ()
     {
@@ -212,53 +212,50 @@ public class DealerScript : MonoBehaviour {
             }
         }
     }
-    int Plbuf, Dealbuf;
+    //int Plbuf, Dealbuf;
     int firstgame;
 
 
     public void NewHand ()
     {
         NEWHANDbutton.SetActive(false);
-        buf = PlayerScore = DealerScore = 0;
+        PlayerScore = DealerScore = 0;
         Finaltxt.text = "";        
         if (firstgame == 0)
         {
             
             DealPos--;
             CurPos--;
-            for (int i = CardOrd-1; i >= CardOrd - (DealPos + CurPos + 1); i--)
+            CardOrd--;
+            for (int i = CardOrd; i >= CardOrd - (DealPos + CurPos + 1); i--)
             {
                 Deck[CardOrder[i]].SetActive(false);
             }
-            
+            CardOrd++;
         }
         DealPos = CurPos = 0;
+        whotogive = 2;
         for (int i = 0; i < 2; i++)
         {
             Deck[CardOrder[CardOrd]].SetActive(true);
             Deck[CardOrder[CardOrd]].transform.localPosition = DealerPosition[DealPos];
-            DealPos++; CardOrd++;
-            DealerScore = buf;
+            DealPos++; CardOrd++;            
         }
-
-        Dealbuf = DealerScore;
-        buf = 0;
+        whotogive = 1;
         for (int i = 0; i < 2; i++)
         {
             Deck[CardOrder[CardOrd]].SetActive(true);
             Deck[CardOrder[CardOrd]].transform.localPosition = CurrentPosition[CurPos];
-            CurPos++; CardOrd++;
-            PlayerScore = buf;
-        }
-        Plbuf = PlayerScore;
-        buf = Plbuf;
+            CurPos++; CardOrd++;            
+        }        
         HITbutton.SetActive(true);
-        STAYbutton.SetActive(true);
-        whotogive = 1;
+        STAYbutton.SetActive(true);        
         onemorecheck = 9;
     }
+
     int onemorecheck;
-    void LateUpdate () {
+
+    void Update () {
 
         PlayerScoretxt.text = "Your Score: " + PlayerScore.ToString();
         DealerScoretxt.text = "Dealer Score: " + DealerScore.ToString();
@@ -266,8 +263,7 @@ public class DealerScript : MonoBehaviour {
         if (whotogive == 1)
         {
             HITbutton.SetActive(true);
-            STAYbutton.SetActive(true);
-            PlayerScore = buf;
+            STAYbutton.SetActive(true);            
 
             if (PlayerScore > 21 && onemorecheck == 0)
             {
@@ -280,9 +276,8 @@ public class DealerScript : MonoBehaviour {
             }
         }
         
-        if (whotogive == 2)
-        {
-            DealerScore = buf;
+        if (whotogive == 2)        {
+            
             if (DealerScore < 17)
             {
                 Deck[CardOrder[CardOrd]].SetActive(true);
