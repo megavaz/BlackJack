@@ -27,7 +27,7 @@ public class DealerScript : MonoBehaviour {
     private Vector2[] CurrentPosition = new Vector2[9];
     private Vector2[] DealerPosition = new Vector2[9];
     int[] CardOrder = new int[261];
-    public GameObject HITbutton, STAYbutton, NEWHANDbutton;
+    public GameObject HITbutton, STAYbutton, NEWHANDbutton, DOUBLEbutton;
 
 
 
@@ -169,7 +169,8 @@ public class DealerScript : MonoBehaviour {
         Debug.Log("clicked");
         Deck[CardOrder[CardOrd]].SetActive(true);
         Deck[CardOrder[CardOrd]].transform.localPosition = CurrentPosition[CurPos];
-        CurPos++; CardOrd++;        
+        CurPos++; CardOrd++;
+        DOUBLEbutton.SetActive(false);
     }
 
     public void STAYenabled ()
@@ -257,7 +258,8 @@ public class DealerScript : MonoBehaviour {
             CurPos++; CardOrd++;            
         }        
         HITbutton.SetActive(true);
-        STAYbutton.SetActive(true);        
+        STAYbutton.SetActive(true);
+        DOUBLEbutton.SetActive(true);
         onemorecheck = 9;
     }
     public InputField input;
@@ -274,6 +276,12 @@ public class DealerScript : MonoBehaviour {
             }
             CardOrd++;
      }
+    public void DOUBLEenabled()
+    {
+        balance -= YourBet;
+        YourBet = YourBet * 2;
+        DOUBLEbutton.SetActive(false);
+    }
 
     public void EnterBet()
     {
@@ -315,6 +323,7 @@ public class DealerScript : MonoBehaviour {
             {
                 Final();
             }
+
             if (DealerScore < 17)
             {
                 Deck[CardOrder[CardOrd]].SetActive(true);
