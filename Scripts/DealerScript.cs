@@ -20,14 +20,14 @@ public class DealerScript : MonoBehaviour {
     public GameObject Three1, Three2, Three3, Three4, Three5, Three6, Three7, Three8, Three9, Three10, Three11, Three12, Three13, Three14, Three15, Three16, Three17, Three18, Three19, Three20;
     public GameObject Two1, Two2, Two3, Two4, Two5, Two6, Two7, Two8, Two9, Two10, Two11, Two12, Two13, Two14, Two15, Two16, Two17, Two18, Two19, Two20;
     public Text DealerScoretxt, PlayerScoretxt, Finaltxt, bet, balancetext;
-    public static int /*buf,*/ DealerScore, PlayerScore;    
+    public static int DealerScore, PlayerScore;    
     public static int NumberOfDecks = 5;
     private GameObject[] Deck = new GameObject[261];
     Vector2 PlayerPosition1 = new Vector2(-65, -35), PlayerPosition2 = new Vector2(-48, -35), PlayerPosition3 = new Vector2(-31, -35), PlayerPosition4 = new Vector2(-14, -35), PlayerPosition5 = new Vector2(3, -35), PlayerPosition6 = new Vector2(20, -35), PlayerPosition7 = new Vector2(37, -35), PlayerPosition8 = new Vector2(54, -35), PlayerPosition9 = new Vector2(71, -35);
     private Vector2[] CurrentPosition = new Vector2[9];
     private Vector2[] DealerPosition = new Vector2[9];
     int[] CardOrder = new int[261];
-    public GameObject HITbutton, STAYbutton, NEWHANDbutton, DOUBLEbutton;
+    public GameObject HITbutton, STAYbutton, NEWHANDbutton, DOUBLEbutton, INSURANCEbutton;
 
 
 
@@ -155,6 +155,7 @@ public class DealerScript : MonoBehaviour {
         fixed (int* m = CardOrder)
         for (int i = 0; i<3; i++)
         Shuffle(m, NumberOfDecks);
+        INSURANCEbutton.SetActive(false);
         inputfield.SetActive(true);
         NEWHANDbutton.SetActive(true);
         firstgame = 1;
@@ -171,6 +172,7 @@ public class DealerScript : MonoBehaviour {
         Deck[CardOrder[CardOrd]].transform.localPosition = CurrentPosition[CurPos];
         CurPos++; CardOrd++;
         DOUBLEbutton.SetActive(false);
+        INSURANCEbutton.SetActive(false);
     }
 
     public void STAYenabled ()
@@ -182,6 +184,7 @@ public class DealerScript : MonoBehaviour {
     }
     public static int whotogive = 0; //defines who will get the next card 0-nobody 1-player 2-computer
     int alreadywon;
+
     public void Final ()
     {
         whotogive = 0;
@@ -202,6 +205,8 @@ public class DealerScript : MonoBehaviour {
             balance += YourBet * 3;
             alreadywon = 1;
         }
+        if (DealerScore == 21 && DealPos == 2)
+            balance += insurance * 2;
         if (DealerScore > 21 && alreadywon == 0)
         {
             Finaltxt.text = "You win";
@@ -230,9 +235,11 @@ public class DealerScript : MonoBehaviour {
         }
         YourBet = 0;        
     }
-    //int Plbuf, Dealbuf;
+    
     int firstgame;
     public static int balance = 10000;
+    public static int valuebuf;
+    int[] twodealerpositions = new int[2];
 
     public void NewHand ()
     {
@@ -248,7 +255,9 @@ public class DealerScript : MonoBehaviour {
         {
             Deck[CardOrder[CardOrd]].SetActive(true);
             Deck[CardOrder[CardOrd]].transform.localPosition = DealerPosition[DealPos];
-            DealPos++; CardOrd++;            
+            DealPos++; CardOrd++;
+            twodealerpositions[i] = valuebuf;
+            Debug.Log(valuebuf);
         }
         whotogive = 1;
         for (int i = 0; i < 2; i++)
@@ -260,10 +269,21 @@ public class DealerScript : MonoBehaviour {
         HITbutton.SetActive(true);
         STAYbutton.SetActive(true);
         DOUBLEbutton.SetActive(true);
+        insurance = 0;
+        if (twodealerpositions[0] == 11)
+            INSURANCEbutton.SetActive(true);
         onemorecheck = 9;
     }
     public InputField input;
     int YourBet;
+    int insurance = 0;
+
+    public void Insurance()
+    {
+        insurance = YourBet/2;
+        balance -= insurance;
+        INSURANCEbutton.SetActive(false);
+    }
 
     public void Clear()
     {            
@@ -281,6 +301,10 @@ public class DealerScript : MonoBehaviour {
         balance -= YourBet;
         YourBet = YourBet * 2;
         DOUBLEbutton.SetActive(false);
+        Deck[CardOrder[CardOrd]].SetActive(true);
+        Deck[CardOrder[CardOrd]].transform.localPosition = CurrentPosition[CurPos];
+        CurPos++; CardOrd++;
+        whotogive = 2;
     }
 
     public void EnterBet()
@@ -317,7 +341,8 @@ public class DealerScript : MonoBehaviour {
             }
         }
         
-        if (whotogive == 2)        {
+        if (whotogive == 2)
+        {
 
             if (PlayerScore == 21 && CurPos == 2)
             {
@@ -337,7 +362,9 @@ public class DealerScript : MonoBehaviour {
                 onemorecheck--;
             if (DealerScore >= 17 && DealerScore < 22)
                 Final();
-         
         }
+
     }
+    
+   
 }

@@ -4,16 +4,15 @@ using UnityEngine;
 
 public class Six : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
+    public static int value = 6;
+
     private void OnEnable()
     {
         if (DealerScript.whotogive == 1)
             DealerScript.PlayerScore += 6;
         if (DealerScript.whotogive == 2)
             DealerScript.DealerScore += 6;
+        DealerScript.valuebuf = value;
     }
     // Update is called once per frame
     void Update () {

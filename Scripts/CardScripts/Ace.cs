@@ -6,6 +6,7 @@ using UnityEngine;
     public class Ace : MonoBehaviour {
     int status = 1;
     int whowasgivento = 0;
+    public static int value = 11;
     
     private void OnEnable()
     {
@@ -15,8 +16,8 @@ using UnityEngine;
         if (DealerScript.whotogive == 2)
             DealerScript.DealerScore += 11;
         whowasgivento = DealerScript.whotogive;
-        status = 1;        
-            
+        status = 1;
+        DealerScript.valuebuf = value;            
     }
     
 
