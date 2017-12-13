@@ -15,6 +15,8 @@ using UnityEngine;
             DealerScript.PlayerScore += 11;
         if (DealerScript.whotogive == 2)
             DealerScript.DealerScore += 11;
+        if (DealerScript.whotogive == 3)
+            DealerScript.SplitScore += 11;
         whowasgivento = DealerScript.whotogive;
         status = 1;
         DealerScript.valuebuf = value;            
@@ -35,6 +37,12 @@ using UnityEngine;
             if ((DealerScript.DealerScore > 21) && (status == 1) && (whowasgivento == 2))
             {
                 DealerScript.DealerScore -= 10;
+                status = 0;
+            }
+        if (DealerScript.whotogive ==3)
+            if ((DealerScript.SplitScore > 21) && (status == 1) && (whowasgivento == 3))
+            {
+                DealerScript.SplitScore -= 10;
                 status = 0;
             }
     }

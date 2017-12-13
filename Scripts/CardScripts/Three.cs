@@ -12,6 +12,8 @@ public class Three : MonoBehaviour {
             DealerScript.PlayerScore += 3;
         if (DealerScript.whotogive == 2)
             DealerScript.DealerScore += 3;
+        if (DealerScript.whotogive == 3)
+            DealerScript.SplitScore += 3;
         DealerScript.valuebuf = value;
     }
     // Update is called once per frame

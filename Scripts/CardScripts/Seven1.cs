@@ -13,6 +13,8 @@ public class Seven1 : MonoBehaviour {
             DealerScript.PlayerScore += 7;
         if (DealerScript.whotogive == 2)
             DealerScript.DealerScore += 7;
+        if (DealerScript.whotogive == 3)
+            DealerScript.SplitScore += 7;
         DealerScript.valuebuf = value;
     }
     // Update is called once per frame

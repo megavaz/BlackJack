@@ -13,6 +13,8 @@ public class Picture : MonoBehaviour
             DealerScript.PlayerScore += 10;
         if (DealerScript.whotogive == 2)
             DealerScript.DealerScore += 10;
+        if (DealerScript.whotogive == 3)
+            DealerScript.SplitScore += 10;
         DealerScript.valuebuf = value;
     }
 

@@ -19,15 +19,16 @@ public class DealerScript : MonoBehaviour {
     public GameObject Four1, Four2, Four3, Four4, Four5, Four6, Four7, Four8, Four9, Four10, Four11, Four12, Four13, Four14, Four15, Four16, Four17, Four18, Four19, Four20;
     public GameObject Three1, Three2, Three3, Three4, Three5, Three6, Three7, Three8, Three9, Three10, Three11, Three12, Three13, Three14, Three15, Three16, Three17, Three18, Three19, Three20;
     public GameObject Two1, Two2, Two3, Two4, Two5, Two6, Two7, Two8, Two9, Two10, Two11, Two12, Two13, Two14, Two15, Two16, Two17, Two18, Two19, Two20;
-    public Text DealerScoretxt, PlayerScoretxt, Finaltxt, bet, balancetext;
-    public static int DealerScore, PlayerScore;    
+    public Text DealerScoretxt, PlayerScoretxt, Finaltxt, bet, balancetext, SplitScoretxt, FinalSplittxt;
+    public static int DealerScore, PlayerScore, SplitScore;    
     public static int NumberOfDecks = 5;
     private GameObject[] Deck = new GameObject[261];
     Vector2 PlayerPosition1 = new Vector2(-65, -35), PlayerPosition2 = new Vector2(-48, -35), PlayerPosition3 = new Vector2(-31, -35), PlayerPosition4 = new Vector2(-14, -35), PlayerPosition5 = new Vector2(3, -35), PlayerPosition6 = new Vector2(20, -35), PlayerPosition7 = new Vector2(37, -35), PlayerPosition8 = new Vector2(54, -35), PlayerPosition9 = new Vector2(71, -35);
     private Vector2[] CurrentPosition = new Vector2[9];
     private Vector2[] DealerPosition = new Vector2[9];
+    private Vector2[] SplitPosition = new Vector2[9];
     int[] CardOrder = new int[261];
-    public GameObject HITbutton, STAYbutton, NEWHANDbutton, DOUBLEbutton, INSURANCEbutton;
+    public GameObject HITbutton, STAYbutton, NEWHANDbutton, DOUBLEbutton, INSURANCEbutton, SPLITbutton;
 
 
 
@@ -142,6 +143,16 @@ public class DealerScript : MonoBehaviour {
         DealerPosition[7] = new Vector2(82, 25);
         DealerPosition[8] = new Vector2(99, 25);
 
+        SplitPosition[0] = new Vector2(-65, -9);
+        SplitPosition[1] = new Vector2(-48, -9);
+        SplitPosition[2] = new Vector2(-31, -9);
+        SplitPosition[3] = new Vector2(-14, -9);
+        SplitPosition[4] = new Vector2(3, -9);
+        SplitPosition[5] = new Vector2(20, -9);
+        SplitPosition[6] = new Vector2(37, -9);
+        SplitPosition[7] = new Vector2(54, -9);
+        SplitPosition[8] = new Vector2(71, -9);
+
         for (int i = 0; i <= 260; i++)
         {
             CardOrder[i] = i;
@@ -154,39 +165,63 @@ public class DealerScript : MonoBehaviour {
 
         fixed (int* m = CardOrder)
         for (int i = 0; i<3; i++)
-        Shuffle(m, NumberOfDecks);
+         Shuffle(m, NumberOfDecks);
         INSURANCEbutton.SetActive(false);
+        SPLITbutton.SetActive(false);
         inputfield.SetActive(true);
         NEWHANDbutton.SetActive(true);
         firstgame = 1;
-        //NewHand();
+        
 
     }
 
     int CurPos = 0, CardOrd = 1, DealPos = 0;
     
+    
     public void HITenabled ()
     {
-        Debug.Log("clicked");
-        Deck[CardOrder[CardOrd]].SetActive(true);
-        Deck[CardOrder[CardOrd]].transform.localPosition = CurrentPosition[CurPos];
-        CurPos++; CardOrd++;
-        DOUBLEbutton.SetActive(false);
-        INSURANCEbutton.SetActive(false);
+        if (whotogive == 1)
+        {
+            Debug.Log("clicked");
+            Deck[CardOrder[CardOrd]].SetActive(true);
+            Deck[CardOrder[CardOrd]].transform.localPosition = CurrentPosition[CurPos];
+            CurPos++; CardOrd++;
+            DOUBLEbutton.SetActive(false);
+            INSURANCEbutton.SetActive(false);
+            SPLITbutton.SetActive(false);
+        }
+        
+        if (whotogive == 3)
+        {
+            Deck[CardOrder[CardOrd]].SetActive(true);
+            Deck[CardOrder[CardOrd]].transform.localPosition = SplitPosition[SplitPos];
+           // SplitScoretxt.text = "Split Score: " + SplitScore.ToString();
+            SplitPos++; CardOrd++;
+        }
     }
 
     public void STAYenabled ()
     {
-        whotogive = 2;        
-        HITbutton.SetActive(false);
-        STAYbutton.SetActive(false);
-        onemorecheck = 9;
+        if (whotogive == 1)
+        {
+            whotogive = 2;
+            HITbutton.SetActive(false);
+            STAYbutton.SetActive(false);
+            onemorecheck = 9;
+        }
+
+        if (whotogive == 3)
+        {
+            whotogive = 1;
+            onemorecheck = 9;
+        }
     }
-    public static int whotogive = 0; //defines who will get the next card 0-nobody 1-player 2-computer
+    public static int whotogive = 0; //defines who will get the next card 0-nobody 1-player 2-computer 3-split
     int alreadywon;
 
     public void Final ()
     {
+        DealerScoretxt.text = "Dealer Score: " + DealerScore.ToString();
         whotogive = 0;
         firstgame = 0;
         alreadywon = 0;
@@ -207,7 +242,7 @@ public class DealerScript : MonoBehaviour {
         }
         if (DealerScore == 21 && DealPos == 2)
             balance += insurance * 2;
-        if (DealerScore > 21 && alreadywon == 0)
+        if (DealerScore > 21 && alreadywon == 0 && PlayerScore < 22)
         {
             Finaltxt.text = "You win";
             balance += YourBet * 2;
@@ -233,13 +268,56 @@ public class DealerScript : MonoBehaviour {
                 balance += YourBet;
             }
         }
-        YourBet = 0;        
+        if (SplitScore != 0)
+        {
+            SplitScoretxt.text = "Split Score: " + SplitScore.ToString();
+            if (SplitScore > 21)
+            {
+                FinalSplittxt.text = "Split lost";
+            }
+            if (SplitScore == 21 && SplitPos == 2)
+            {
+                FinalSplittxt.text = "Split win triple";
+                balance += SplitBet * 3;
+                alreadywon = 1;
+            }
+
+            if (DealerScore > 21 && alreadywon == 0 && SplitScore < 22)
+            {
+                FinalSplittxt.text = "Split win";
+                balance += SplitBet * 2;
+            }
+            if (DealerScore < 22 && SplitScore < 22)
+            {
+                if (DealerScore > SplitScore)
+                {
+                    FinalSplittxt.text = "Split lost";
+                }
+
+                if (DealerScore < SplitScore && alreadywon == 0)
+                {
+
+                    FinalSplittxt.text = "Split win";
+                    balance += SplitBet * 2;
+
+                }
+
+                if (DealerScore == SplitScore)
+                {
+                    FinalSplittxt.text = "Draw";
+                    balance += SplitBet;
+                }
+            }
+        }
+        YourBet = 0;
+        SplitBet = 0;
     }
     
     int firstgame;
     public static int balance = 10000;
     public static int valuebuf;
     int[] twodealerpositions = new int[2];
+    int[] twoplayerpositions = new int[2];
 
     public void NewHand ()
     {
@@ -247,9 +325,11 @@ public class DealerScript : MonoBehaviour {
             Clear();
         NEWHANDbutton.SetActive(false);
         inputfield.SetActive(false);
-        PlayerScore = DealerScore = 0;
+        PlayerScore = DealerScore = SplitScore = 0;
         Finaltxt.text = "";
-        DealPos = CurPos = 0;
+        SplitScoretxt.text = "";
+        FinalSplittxt.text = "";
+        DealPos = CurPos = SplitPos = 0;
         whotogive = 2;
         for (int i = 0; i < 2; i++)
         {
@@ -264,7 +344,8 @@ public class DealerScript : MonoBehaviour {
         {
             Deck[CardOrder[CardOrd]].SetActive(true);
             Deck[CardOrder[CardOrd]].transform.localPosition = CurrentPosition[CurPos];
-            CurPos++; CardOrd++;            
+            CurPos++; CardOrd++;
+            twoplayerpositions[i] = valuebuf;
         }        
         HITbutton.SetActive(true);
         STAYbutton.SetActive(true);
@@ -272,6 +353,8 @@ public class DealerScript : MonoBehaviour {
         insurance = 0;
         if (twodealerpositions[0] == 11)
             INSURANCEbutton.SetActive(true);
+        if (twoplayerpositions[0] == twoplayerpositions[1])
+            SPLITbutton.SetActive(true);
         onemorecheck = 9;
     }
     public InputField input;
@@ -290,7 +373,8 @@ public class DealerScript : MonoBehaviour {
             DealPos--;
             CurPos--;
             CardOrd--;
-            for (int i = CardOrd; i >= CardOrd - (DealPos + CurPos + 1); i--)
+            SplitPos--;
+            for (int i = CardOrd; i >= CardOrd - (DealPos + CurPos + SplitPos + 2); i--)
             {
                 Deck[CardOrder[i]].SetActive(false);
             }
@@ -317,6 +401,42 @@ public class DealerScript : MonoBehaviour {
     }
     public GameObject inputfield;
     int onemorecheck;
+    int SplitPos;
+    int SplitBet;
+
+    public void Split()
+    {
+        DOUBLEbutton.SetActive(false);
+        INSURANCEbutton.SetActive(false);
+        SPLITbutton.SetActive(false);        
+        SplitPos = 0;        
+        CurPos--;
+        if (twoplayerpositions[0] == 11)
+        {
+            Deck[CardOrder[CardOrd - 1]].transform.localPosition = SplitPosition[SplitPos];
+            Deck[CardOrder[CardOrd - 1]].SetActive(false); whotogive = 3; Deck[CardOrder[CardOrd - 1]].SetActive(true); whotogive = 1;
+            PlayerScore = 0;
+            Deck[CardOrder[CardOrd - 2]].SetActive(false); Deck[CardOrder[CardOrd - 2]].SetActive(true);            
+            SplitPos++;
+        }
+        else
+        {
+            Deck[CardOrder[CardOrd - 1]].transform.localPosition = SplitPosition[SplitPos];
+            SplitPos++;
+            SplitScore = PlayerScore / 2;
+            PlayerScore = PlayerScore / 2;
+        }
+        SplitBet = YourBet;
+        balance -= YourBet;
+        Deck[CardOrder[CardOrd]].SetActive(true);
+        Deck[CardOrder[CardOrd]].transform.localPosition = CurrentPosition[CurPos];
+        CurPos++; CardOrd++;
+        whotogive = 3;
+        Deck[CardOrder[CardOrd]].SetActive(true);
+        Deck[CardOrder[CardOrd]].transform.localPosition = SplitPosition[SplitPos];
+        SplitPos++; CardOrd++;
+        SplitScoretxt.text = "Split Score: " + SplitScore.ToString();
+    }
 
     void Update () {
 
@@ -324,7 +444,8 @@ public class DealerScript : MonoBehaviour {
         DealerScoretxt.text = "Dealer Score: " + DealerScore.ToString();
         balancetext.text = "Your Balance: " + balance.ToString();
         bet.text = "Your Bet: " + YourBet.ToString();
-
+        if (SplitScore != 0)
+            SplitScoretxt.text = "Split Score: " + SplitScore.ToString();
         if (whotogive == 1)
         {
             HITbutton.SetActive(true);
@@ -332,7 +453,8 @@ public class DealerScript : MonoBehaviour {
 
             if (PlayerScore > 21 && onemorecheck == 0)
             {
-                Final();
+                whotogive = 2;
+                onemorecheck = 9;
             }
 
             if (PlayerScore > 21 && onemorecheck > 0)
@@ -344,11 +466,11 @@ public class DealerScript : MonoBehaviour {
         if (whotogive == 2)
         {
 
-            if (PlayerScore == 21 && CurPos == 2)
+
+            if (SplitScore > 21 && PlayerScore > 21)
             {
                 Final();
             }
-
             if (DealerScore < 17)
             {
                 Deck[CardOrder[CardOrd]].SetActive(true);
@@ -364,7 +486,20 @@ public class DealerScript : MonoBehaviour {
                 Final();
         }
 
-    }
-    
+        if (whotogive ==3)
+        {
+            if (SplitScore > 21 && onemorecheck == 0)
+            {
+                whotogive = 1;
+                onemorecheck = 9;
+            }
+
+            if (SplitScore > 21 && onemorecheck > 0)
+            {
+                onemorecheck--;
+            }
+        }
+
+    }   
    
 }
