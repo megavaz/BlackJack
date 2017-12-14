@@ -28,7 +28,7 @@ public class DealerScript : MonoBehaviour {
     private Vector2[] DealerPosition = new Vector2[9];
     private Vector2[] SplitPosition = new Vector2[9];
     int[] CardOrder = new int[261];
-    public GameObject HITbutton, STAYbutton, NEWHANDbutton, DOUBLEbutton, INSURANCEbutton, SPLITbutton;
+    public GameObject HITbutton, STAYbutton, NEWHANDbutton, DOUBLEbutton, INSURANCEbutton, SPLITbutton, cover;
 
 
 
@@ -47,7 +47,8 @@ public class DealerScript : MonoBehaviour {
             return CO;
         }
     }
-    unsafe void Start () {
+    unsafe void Start()
+    {
 
         PlayerScore = DealerScore = 0;
 
@@ -56,7 +57,7 @@ public class DealerScript : MonoBehaviour {
             Deck[i] = new GameObject();
         }
 
-        Deck[1]= Ace1; Deck[2]= Ace2; Deck[3] = Ace3; Deck[4] = Ace4;
+        Deck[1] = Ace1; Deck[2] = Ace2; Deck[3] = Ace3; Deck[4] = Ace4;
         Deck[5] = King1; Deck[6] = King2; Deck[7] = King3; Deck[8] = King4;
         Deck[9] = Queen1; Deck[10] = Queen2; Deck[11] = Queen3; Deck[12] = Queen4;
         Deck[13] = Jack1; Deck[14] = Jack2; Deck[15] = Jack3; Deck[16] = Jack4;
@@ -164,17 +165,16 @@ public class DealerScript : MonoBehaviour {
         }
 
         fixed (int* m = CardOrder)
-        for (int i = 0; i<3; i++)
-         Shuffle(m, NumberOfDecks);
+            for (int i = 0; i < 3; i++)
+                Shuffle(m, NumberOfDecks);
         INSURANCEbutton.SetActive(false);
         SPLITbutton.SetActive(false);
         inputfield.SetActive(true);
         NEWHANDbutton.SetActive(true);
+        cover.SetActive(false);
         firstgame = 1;
-        
-
+        split_was_hit = 0;
     }
-
     int CurPos = 0, CardOrd = 1, DealPos = 0;
     
     
@@ -207,6 +207,7 @@ public class DealerScript : MonoBehaviour {
             whotogive = 2;
             HITbutton.SetActive(false);
             STAYbutton.SetActive(false);
+            cover.SetActive(false);
             onemorecheck = 9;
         }
 
@@ -329,8 +330,10 @@ public class DealerScript : MonoBehaviour {
         Finaltxt.text = "";
         SplitScoretxt.text = "";
         FinalSplittxt.text = "";
+        DealerScoretxt.text = "Dealer Score: ";
         DealPos = CurPos = SplitPos = 0;
         whotogive = 2;
+        cover.SetActive(true);
         for (int i = 0; i < 2; i++)
         {
             Deck[CardOrder[CardOrd]].SetActive(true);
@@ -383,6 +386,7 @@ public class DealerScript : MonoBehaviour {
     public void DOUBLEenabled()
     {
         balance -= YourBet;
+        cover.SetActive(false);
         YourBet = YourBet * 2;
         DOUBLEbutton.SetActive(false);
         Deck[CardOrder[CardOrd]].SetActive(true);
@@ -403,9 +407,10 @@ public class DealerScript : MonoBehaviour {
     int onemorecheck;
     int SplitPos;
     int SplitBet;
-
+    int split_was_hit;
     public void Split()
     {
+        split_was_hit = 1;
         DOUBLEbutton.SetActive(false);
         INSURANCEbutton.SetActive(false);
         SPLITbutton.SetActive(false);        
@@ -441,7 +446,7 @@ public class DealerScript : MonoBehaviour {
     void Update () {
 
         PlayerScoretxt.text = "Your Score: " + PlayerScore.ToString();
-        DealerScoretxt.text = "Dealer Score: " + DealerScore.ToString();
+       // DealerScoretxt.text = "Dealer Score: " + DealerScore.ToString();
         balancetext.text = "Your Balance: " + balance.ToString();
         bet.text = "Your Bet: " + YourBet.ToString();
         if (SplitScore != 0)
@@ -453,8 +458,17 @@ public class DealerScript : MonoBehaviour {
 
             if (PlayerScore > 21 && onemorecheck == 0)
             {
-                whotogive = 2;
-                onemorecheck = 9;
+                if (split_was_hit == 1)
+                {
+                    whotogive = 2;
+                    onemorecheck = 9;
+                    cover.SetActive(false);
+                }
+                if (split_was_hit == 0)
+                {
+                    Final();
+                    cover.SetActive(false);
+                }
             }
 
             if (PlayerScore > 21 && onemorecheck > 0)
@@ -492,6 +506,7 @@ public class DealerScript : MonoBehaviour {
             {
                 whotogive = 1;
                 onemorecheck = 9;
+                split_was_hit = 0;
             }
 
             if (SplitScore > 21 && onemorecheck > 0)
